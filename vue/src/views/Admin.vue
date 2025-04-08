@@ -15,6 +15,7 @@
           action="http://localhost:8080/admin/import"
           :show-file-list="false"
           :on-success="handleImportSuccess"
+          :headers="{ token: data.user.token }"
       >
         <el-button type="success">批量导入</el-button>
       </el-upload>
@@ -238,7 +239,7 @@ const exportData = () => {
   let url = `http://localhost:8080/admin/export?username=${data.username === null ? '' : data.username}`
       + `&name=${data.name === null ? '' : data.name}`
       + `&ids=${idsStr}`
-      + `&token=${data.user.name}`
+      + `&token=${data.user.token}`
   window.open(url)
 }
 

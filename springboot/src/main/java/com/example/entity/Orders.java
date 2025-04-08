@@ -14,9 +14,4 @@ public class Orders {
 
     private String supplierName;
 
-    // 非数据库字段，用于批量导出时接收多个id
-    private String ids;
-    private String[] idsarr;
-
-
 }

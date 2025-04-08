@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -77,8 +78,8 @@ public class AdminController {
     public void exportData(Admin admin, HttpServletResponse response) throws Exception {
         String ids = admin.getIds();
         if (StrUtil.isNotBlank(ids)) {
-            String[] idArr = ids.split(",");
-            admin.setIdsarr(idArr);
+            var idArr = Arrays.stream(ids.split(",")).toList();
+            admin.setIdsArr(idArr);
         }
         // 1. 拿到所有数据
         List<Admin> list = adminService.selectAll(admin);

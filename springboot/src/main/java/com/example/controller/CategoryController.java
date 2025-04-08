@@ -57,26 +57,4 @@ public class CategoryController {
         return Result.success(info);
     }
 
-    @GetMapping("/export")
-    public void exportData(Category category, HttpServletResponse response) {
-        try {
-            categoryService.exportData(category, response);
-        } catch (IOException e) {
-            // 可以在这里添加日志记录，比如使用 slf4j
-            e.printStackTrace();
-            // 这里可以返回错误响应给前端，不过由于是 void 方法，需要调整设计
-        }
-    }
-
-    @PostMapping("/import")
-    public Result importData(@RequestPart("file") MultipartFile file) {
-        try {
-            categoryService.importData(file);
-            return Result.success();
-        } catch (IOException e) {
-            // 可以在这里添加日志记录，比如使用 slf4j
-            e.printStackTrace();
-            return Result.error("导入数据失败: " + e.getMessage());
-        }
-    }
 }

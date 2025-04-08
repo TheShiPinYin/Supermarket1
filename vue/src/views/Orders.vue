@@ -9,16 +9,7 @@
 
     <div class="card" style="margin-bottom: 5px">
       <el-button type="primary" @click="handleAdd">新 增</el-button>
-      <el-button type="danger" @click="deleteBatch" :disabled="selectedRows.length === 0">批量删除</el-button>
-      <el-button type="info" @click="exportData">批量导出</el-button>
-      <el-upload
-          style="display: inline-block; margin-left: 10px"
-          action="http://localhost:8080/orders/import"
-          :show-file-list="false"
-          :on-success="handleImportSuccess"
-      >
-        <el-button type="success">批量导入</el-button>
-      </el-upload>
+      <el-button type="danger" @click="deleteBatch">批量删除</el-button>
     </div>
 
     <div class="card" style="margin-bottom: 5px">
@@ -133,8 +124,6 @@ const data = reactive({
 
 const formRef = ref()
 
-const selectedRows = ref([])
-
 const load = () => {
   request.get('/orders/selectPage', {
     params: {
@@ -231,10 +220,18 @@ const del = (id) => {
   }).catch(err => {})
 }
 
+const handleSelectionChange = (rows) => {  // rows 就是实际选择的数组
+  data.rows = rows
+  data.ids = data.rows.map(v => v.id) // map可以把对象的数组 转换成一个纯数字的数组
+}
+
 const deleteBatch = () => {
-  const ids = selectedRows.value.map(row => row.id);
-  ElMessageBox.confirm('删除后无法恢复，您确认批量删除吗？', '删除确认', { type: 'warning' }).then(res => {
-    request.delete('/orders/deleteBatch', { data: ids }).then(res => {
+  if (data.rows.length === 0) {
+    ElMessage.warning('请选择数据')
+    return
+  }
+  ElMessageBox.confirm('删除后无法恢复，您确认删除吗？', '删除确认', { type: 'warning' }).then(res => {
+    request.delete('/orders/deleteBatch', { data: data.rows }).then(res => {
       if (res.code === '200') {
         ElMessage.success('批量删除成功')
         load()
@@ -245,21 +242,4 @@ const deleteBatch = () => {
   }).catch(err => {})
 }
 
-const exportData = () => {
-  const ids = selectedRows.value.map(row => row.id).join(',');
-  window.location.href = `http://localhost:8080/orders/export?ids=${ids}&orderNo=${data.orderNo}&name=${data.name}`;
-}
-
-const handleImportSuccess = (res) => {
-  if (res.code === '200') {
-    ElMessage.success('导入成功')
-    load()
-  } else {
-    ElMessage.error(res.msg)
-  }
-}
-
-const handleSelectionChange = (val) => {
-  selectedRows.value = val
-}
 </script>

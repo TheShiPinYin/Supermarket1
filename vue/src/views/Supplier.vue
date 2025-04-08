@@ -12,15 +12,6 @@
     <div class="card" style="margin-bottom: 5px">
       <el-button type="primary" @click="handleAdd">新 增</el-button>
       <el-button type="danger" @click="deleteBatch">批量删除</el-button>
-      <el-button type="info" @click="exportData">批量导出</el-button>
-      <el-upload
-          style="display: inline-block; margin-left: 10px"
-          action="http://localhost:8080/supplier/import"
-          :show-file-list="false"
-          :on-success="handleImportSuccess"
-      >
-        <el-button type="success">批量导入</el-button>
-      </el-upload>
     </div>
 
     <!-- 表格区域 -->
@@ -98,17 +89,15 @@ const data = reactive({
   tableData: [],
   formVisible: false,
   form: {},
-  rules: {
-    name: [
-      { required: true, message: '请填写供货商名称', trigger: 'blur' },
-    ],
-    content: [
-      { required: true, message: '请填写供货商说明', trigger: 'blur' },
-    ],
-  },
   rows: [],
   ids: []
 });
+
+const rules = reactive({
+  name: [
+    { required: true, message: '请填写供货商名称', trigger: 'blur' },
+  ]
+})
 
 const formRef = ref()
 
@@ -226,22 +215,4 @@ const deleteBatch = () => {
   }).catch(err => {});
 };
 
-// 批量导出操作
-const exportData = () => {
-  let idsStr = data.ids.join(",");
-  let url = `http://localhost:8080/supplier/export?name=${data.name === null ? '' : data.name}`
-      + `&ids=${idsStr}`
-      + `&token=${data.user.name}`;
-  window.open(url);
-};
-
-// 批量导入成功处理
-const handleImportSuccess = (res) => {
-  if (res.code === '200') {
-    ElMessage.success('批量导入数据成功');
-    load();
-  } else {
-    ElMessage.error(res.msg);
-  }
-};
 </script>

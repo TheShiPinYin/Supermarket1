@@ -64,38 +64,4 @@ public class SupplierController {
         return Result.success(info);
     }
 
-    @GetMapping("/export")
-    public void exportData(Supplier supplier, HttpServletResponse response) throws Exception {
-        String ids = supplier.getIds();
-        if (StrUtil.isNotBlank(ids)) {
-            String[] idArr = ids.split(",");
-            supplier.setIdsarr(idArr);
-        }
-        List<Supplier> list = supplierService.selectAll(supplier);
-        ExcelWriter writer = ExcelUtil.getWriter(true);
-        writer.addHeaderAlias("name", "供货商名称");
-        writer.addHeaderAlias("content", "供货商说明");
-        writer.setOnlyAlias(true);
-        writer.write(list);
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("供货商信息", StandardCharsets.UTF_8);
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-        ServletOutputStream os = response.getOutputStream();
-        writer.flush(os);
-        writer.close();
-        os.close();
-    }
-
-    @PostMapping("/import")
-    public Result importData(MultipartFile file) throws Exception {
-        InputStream inputStream = file.getInputStream();
-        ExcelReader reader = ExcelUtil.getReader(inputStream);
-        reader.addHeaderAlias("供货商名称", "name");
-        reader.addHeaderAlias("供货商说明", "content");
-        List<Supplier> list = reader.readAll(Supplier.class);
-        for (Supplier supplier : list) {
-            supplierService.add(supplier);
-        }
-        return Result.success();
-    }
 }

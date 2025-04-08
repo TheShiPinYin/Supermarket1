@@ -7,7 +7,7 @@
     <select id="selectAll" resultType="com.example.entity.User">
         select * from `user`
         <where>
-            <if test="username != null and username != 'null'">username like concat('%', #{username}, '%')</if>
+            <if test="username != null and username != ''">username like concat('%', #{username}, '%')</if>
             <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>  <!-- 相当于 name like '%1%' -->
             <if test="ids != null and ids !=''">
                 and id in

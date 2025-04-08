@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.io.IOException;
 import java.util.List;
 
@@ -58,18 +57,4 @@ public class OrdersController {
         return Result.success(info);
     }
 
-    @GetMapping("/export")
-    public void exportData(Orders orders, HttpServletResponse response) throws IOException {
-        try {
-            ordersService.exportData(orders, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @PostMapping("/import")
-    public Result importData(@RequestParam("file") MultipartFile file) throws Exception {
-        ordersService.importData(file);
-        return Result.success();
-    }
 }

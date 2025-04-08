@@ -9,15 +9,6 @@
     <div class="card" style="margin-bottom: 5px">
       <el-button type="primary" @click="handleAdd">新 增</el-button>
       <el-button type="danger" @click="deleteBatch">批量删除</el-button>
-      <el-button type="info" @click="exportData">批量导出</el-button>
-      <el-upload
-          style="display: inline-block; margin-left: 10px"
-          action="http://localhost:8080/goods/import"
-          :show-file-list="false"
-          :on-success="handleImportSuccess"
-      >
-        <el-button type="success">批量导入</el-button>
-      </el-upload>
     </div>
 
     <div class="card" style="margin-bottom: 5px">
@@ -38,7 +29,7 @@
         <el-table-column label="操作" width="100">
           <template #default="scope">
             <el-button type="primary" :icon="Edit" circle @click="handleEdit(scope.row)"></el-button>
-            <el-button type="danger" :icon="Delete" circle @click="dele(scope.row.id)"></el-button>
+            <el-button type="danger" :icon="Delete" circle @click="del(scope.row.id)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -58,7 +49,7 @@
 
     <el-dialog width="35%" v-model="data.formVisible" title="商品信息" destroy-on-close>
       <el-form :model="data.form" ref="formRef" :rules="rules" label-width="100px" label-position="right" style="padding-right: 40px">
-        <el-form-item label="商品名称" prop="name">
+        <el-form-item label="商品图片" prop="picture">
           <el-upload
               class="upload-demo"
               :action="'http://localhost:8080/files/upload'"
@@ -196,7 +187,7 @@ const save = () => {
   })
 }
 
-const dele = (id) => {
+const del = (id) => {
   ElMessageBox.confirm('删除数据后无法恢复，您确认删除吗？', '删除确认', { type: 'warning' }).then(res => {
     request.delete('/goods/deleteById/' + id).then(res => {
       if (res.code === '200') {
@@ -214,8 +205,6 @@ const load = () => {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
-      // 如果不需要 name 参数，可以移除
-      // name: data.name
     }
   }).then(res => {
     if (res.code === '200') {
@@ -225,11 +214,6 @@ const load = () => {
       ElMessage.error(res.msg)
     }
   })
-}
-
-const changePage = (pageNum) => {
-  data.pageNum = pageNum
-  load()
 }
 
 const reset = () => {
@@ -257,22 +241,6 @@ const deleteBatch = () => {
       }
     })
   }).catch(err => {})
-}
-
-const exportData = () => {
-  let idsStr = data.ids.join(",")
-  let url = `http://localhost:8080/goods/export?name=${data.name === null ? '' : data.name}`
-      + `&ids=${idsStr}`
-  window.open(url)
-}
-
-const handleImportSuccess = (res) => {
-  if (res.code === '200') {
-    ElMessage.success('批量导入数据成功')
-    load()
-  } else {
-    ElMessage.error(res.msg)
-  }
 }
 
 loadCategory()

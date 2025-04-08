@@ -13,9 +13,14 @@
     <div class="card" style="margin-bottom: 5px">
       <el-table :data="data.tableData" style="width: 100%" :header-cell-style="{ color: '#333', backgroundColor: '#eaf4ff' }">
         <el-table-column prop="title" label="公告标题" />
-        <el-table-column prop="content" label="公告内容" />
+        <el-table-column prop="content" label="公告内容">
+          <template v-slot="scope">
+            <span v-if="data.user.role === 'ADMIN'">{{ scope.row.content }}</span>
+            <span v-if="data.user.role === 'USER'">您暂无权限查看</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="time" label="发布时间" />
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作" width="100" v-if="data.user.role === 'ADMIN'">
           <template #default="scope">
             <el-button type="primary" icon="Edit" circle @click="handleEdit(scope.row)"></el-button>
             <el-button type="danger" icon="Delete" circle @click="del(scope.row.id)"></el-button>
@@ -24,13 +29,25 @@
       </el-table>
     </div>
 
+    <div class="card">
+      <el-pagination
+          v-model:current-page="data.pageNum"
+          v-model:page-size="data.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[5, 10, 20]"
+          :total="data.total"
+          @current-change="load"
+          @size-change="load"
+      />
+    </div>
+
     <el-dialog title="公告信息" v-model="data.formVisible" width="30%" destroy-on-close>
       <el-form ref="formRef" :model="data.form" :rules="data.rules" label-width="80px" style="padding: 20px 30px 10px 0">
         <el-form-item prop="title" label="公告标题">
-          <el-input v-model="data.form.title" autocomplete="off" placeholder="请输入公告标题"/>
+          <el-input v-model="data.form.title" autocomplete="off" placeholder="请输入公告标题" />
         </el-form-item>
         <el-form-item prop="content" label="公告内容">
-          <el-input type="textarea" :row="3" v-model="data.form.content" autocomplete="off" placeholder="请输入公告内容"/>
+          <el-input type="textarea" :rows="3" v-model="data.form.content" autocomplete="off" placeholder="请输入公告内容" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -40,7 +57,6 @@
         </div>
       </template>
     </el-dialog>
-
   </div>
 </template>
 <script setup>
@@ -52,7 +68,7 @@ import {ElMessage, ElMessageBox} from "element-plus";
 const formRef = ref()
 
 const data = reactive({
-  user: JSON.parse(localStorage.getItem('code_user') || '{}'),
+  user: JSON.parse(localStorage.getItem('code_user') || "{}"),
   title: null,
   pageNum: 1,
   pageSize: 5,
@@ -71,16 +87,16 @@ const data = reactive({
 })
 
 const load = () => {
-  request.get('notice/selectPage', {
+  request.get('/notice/selectPage', {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
-      title: data.title,
+      title: data.title
     }
   }).then(res => {
-    if (res.code == '200') {
+    if (res.code === '200') {
       data.tableData = res.data?.list
-      data.total = res.total?.total
+      data.total = res.data?.total
     } else {
       ElMessage.error(res.msg)
     }
@@ -99,18 +115,20 @@ const handleEdit = (row) => {
 }
 
 const add = () => {
-  request.post('notice/add', data.form).then(res => {
-    if (res.code == '200') {
+  request.post('/notice/add', data.form).then(res => {
+    if (res.code === '200') {
       ElMessage.success('新增成功')
       data.formVisible = false
       load()
+    } else {
+      ElMessage.error(res.msg)
     }
   })
 }
 
-const update = (row) => {
-  request.put('notice/update', data.form).then(res => {
-    if (res.code == '200') {
+const update = () => {
+  request.put('/notice/update', data.form).then(res => {
+    if (res.code === '200') {
       ElMessage.success('更新成功')
       data.formVisible = false
       load()
@@ -145,5 +163,4 @@ const reset = () => {
   data.title = null
   load()
 }
-
 </script>

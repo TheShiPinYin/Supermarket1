@@ -2,6 +2,8 @@ package com.example.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 管理员信息
  */
@@ -19,6 +21,6 @@ public class Admin extends Account {
 
     // 非数据库字段
     private String ids;
-    private String[] idsarr;
+    private List<String> idsArr;
 
 }

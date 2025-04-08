@@ -16,8 +16,5 @@ public class Goods {
     private String categoryName;
     private String supplierName;
 
-    // 非数据库字段
-    private String ids;
-    private String[] idsarr;
 
 }

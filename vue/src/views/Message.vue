@@ -24,6 +24,18 @@
       </el-table>
     </div>
 
+    <div class="card">
+      <el-pagination
+          v-model:current-page="data.pageNum"
+          v-model:page-size="data.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[5, 10, 20]"
+          :total="data.total"
+          @current-change="load"
+          @size-change="load"
+      />
+    </div>
+
     <el-dialog title="留言信息" v-model="data.formVisible" width="30%" destroy-on-close>
       <el-form ref="formRef" :model="data.form" :rules="data.rules" label-width="80px" style="padding: 20px 30px 10px 0">
         <el-form-item prop="username" label="用户名">

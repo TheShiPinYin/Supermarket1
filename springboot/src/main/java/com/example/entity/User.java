@@ -2,6 +2,8 @@ package com.example.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 普通用户信息
  */
@@ -19,6 +21,6 @@ public class User extends Account {
 
     // 非数据库字段
     private String ids;
-    private String[] idsarr;
-    
+    private List<String> idsArr;
+
 }

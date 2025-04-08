@@ -13,11 +13,13 @@
     </select>
 
     <insert id="insert">
-        insert into `notice` (title, content, time) values(#{title}, #{content}, #{time})
+        insert into `notice` (title, content, time)
+        values(#{title}, #{content}, #{time})
     </insert>
 
     <update id="updateById">
-        update `notice` set title = #{title}, content = #{content}, time = #{time} where id = #{id}
+        update `notice` set title = #{title}, content = #{content}, time = #{time}
+        where id = #{id}
     </update>
 
 </mapper>

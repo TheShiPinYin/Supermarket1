@@ -8,21 +8,10 @@
 
     <div class="card" style="margin-bottom: 5px">
       <el-button type="primary" @click="handleAdd">新增</el-button>
-      <el-button type="danger" @click="deleteBatch">批量删除</el-button>
-      <el-button type="info" @click="exportData">批量导出</el-button>
-      <el-upload
-          style="display: inline-block; margin-left: 10px"
-          action="http://localhost:8080/category/import"
-          :show-file-list="false"
-          :on-success="handleImportSuccess"
-      >
-        <el-button type="success">批量导入</el-button>
-      </el-upload>
     </div>
 
     <div class="card" style="margin-bottom: 5px">
-      <el-table :data="data.tableData" style="width: 100%" @selection-change="handleSelectionChange"
-                :header-cell-style="{ color: '#333', backgroundColor: '#eaf4ff' }">
+      <el-table :data="data.tableData" style="width: 100%" :header-cell-style="{ color: '#333', backgroundColor: '#eaf4ff' }">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="序号" width="70"/>
         <el-table-column prop="name" label="分类名称"/>
@@ -30,7 +19,7 @@
         <el-table-column label="操作" width="100">
           <template #default="scope">
             <el-button type="primary" icon="Edit" circle @click="handleEdit(scope.row)"></el-button>
-            <el-button type="danger" icon="Delete" circle @click="dele(scope.row.id)"></el-button>
+            <el-button type="danger" icon="Delete" circle @click="del(scope.row.id)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -68,11 +57,11 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
-import { Search } from "@element-plus/icons-vue";
+import {reactive, ref} from "vue";
 import request from "@/utils/request.js";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { saveAs } from 'file-saver';
+
+const formRef = ref()
 
 const data = reactive({
   user: JSON.parse(localStorage.getItem('code_user') || '{}'),
@@ -88,11 +77,7 @@ const data = reactive({
       { required: true, message: '请输入分类名称', trigger: 'blur' },
     ]
   },
-  rows: [],
-  ids: []
 });
-
-const formRef = ref()
 
 const load = () => {
   request.get('/category/selectPage', {
@@ -112,30 +97,9 @@ const load = () => {
 };
 load();
 
-const reset = () => {
-  data.name = '';
-  load();
-};
-
 const handleAdd = () => {
   data.formVisible = true;
   data.form = {};
-};
-
-const add = () => {
-  formRef.value.validate((valid) => {
-    if (valid) {
-      request.post('/category/add', data.form).then(res => {
-        if (res.code === '200') {
-          data.formVisible = false;
-          ElMessage.success('新增成功');
-          load();
-        } else {
-          ElMessage.error(res.msg);
-        }
-      });
-    }
-  });
 };
 
 const handleEdit = (row) => {
@@ -143,27 +107,39 @@ const handleEdit = (row) => {
   data.formVisible = true;
 };
 
-const update = () => {
-  formRef.value.validate((valid) => {
-    if (valid) {
-      request.put('/category/update', data.form).then(res => {
-        if (res.code === '200') {
-          data.formVisible = false;
-          ElMessage.success('修改成功');
-          load();
-        } else {
-          ElMessage.error(res.msg);
-        }
-      });
+const add = () => {
+  request.post('/category/add', data.form).then(res => {
+    if (res.code === '200') {
+      data.formVisible = false;
+      ElMessage.success('新增成功');
+      load();
+    } else {
+      ElMessage.error(res.msg);
     }
-  });
-};
+  })
+}
+
+const update = () => {
+  request.put('/category/update', data.form).then(res => {
+    if (res.code === '200') {
+      data.formVisible = false;
+      ElMessage.success('修改成功');
+      load();
+    } else {
+      ElMessage.error(res.msg);
+    }
+  })
+}
 
 const save = () => {
-  data.form.id ? update() : add();
-};
+  formRef.value.validate(valid => {
+    if (valid) {
+      data.form.id ? update() : add()
+    }
+  })
+}
 
-const dele = (id) => {
+const del = (id) => {
   ElMessageBox.confirm('删除后无法恢复，您确认删除吗？', '删除确认', { type: 'warning' }).then(res => {
     request.delete('/category/deleteById/' + id).then(res => {
       if (res.code === '200') {
@@ -176,42 +152,8 @@ const dele = (id) => {
   }).catch(err => {});
 };
 
-const handleSelectionChange = (rows) => {
-  data.rows = rows;
-  data.ids = data.rows.map(v => v.id);
-};
-
-const deleteBatch = () => {
-  if (data.rows.length === 0) {
-    ElMessage.warning('请选择数据');
-    return;
-  }
-  ElMessageBox.confirm('删除后无法恢复，您确认删除吗？', '删除确认', { type: 'warning' }).then(res => {
-    request.delete('/category/deleteBatch', { data: data.rows }).then(res => {
-      if (res.code === '200') {
-        ElMessage.success('批量删除成功');
-        load();
-      } else {
-        ElMessage.error(res.msg);
-      }
-    });
-  }).catch(err => {});
-};
-
-const exportData = () => {
-  let idsStr = data.ids.join(",");
-  let url = `http://localhost:8080/category/export?name=${data.name === null ? '' : data.name}`
-      + `&ids=${idsStr}`
-      + `&token=${data.user.name}`;
-  window.open(url);
-};
-
-const handleImportSuccess = (res) => {
-  if (res.code === '200') {
-    ElMessage.success('批量导入数据成功');
-    load();
-  } else {
-    ElMessage.error(res.msg);
-  }
-};
+const reset = () => {
+  data.name = ''
+  load()
+}
 </script>

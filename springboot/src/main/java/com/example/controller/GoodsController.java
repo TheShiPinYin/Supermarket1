@@ -59,44 +59,4 @@ public class GoodsController {
         return Result.success(pageInfo);
     }
 
-    @GetMapping("/export")
-    public void exportData(Goods goods, HttpServletResponse response) throws Exception {
-        String ids = goods.getIds();
-        if (StrUtil.isNotBlank(ids)) {
-            String[] idArr = ids.split(",");
-            goods.setIdsarr(idArr);
-        }
-        List<Goods> list = goodsService.selectAll();
-        ExcelWriter writer = ExcelUtil.getWriter(true);
-        writer.addHeaderAlias("name", "商品名称");
-        writer.addHeaderAlias("price", "商品价格");
-        writer.addHeaderAlias("categoryName", "商品分类");
-        writer.addHeaderAlias("supplierName", "供货商");
-        writer.addHeaderAlias("count", "商品库存");
-        writer.setOnlyAlias(true);
-        writer.write(list);
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("商品信息", StandardCharsets.UTF_8);
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-        ServletOutputStream os = response.getOutputStream();
-        writer.flush(os);
-        writer.close();
-        os.close();
-    }
-
-    @PostMapping("/import")
-    public Result importData(MultipartFile file) throws Exception {
-        InputStream inputStream = file.getInputStream();
-        ExcelReader reader = ExcelUtil.getReader(inputStream);
-        reader.addHeaderAlias("name", "商品名称");
-        reader.addHeaderAlias("price", "商品价格");
-        reader.addHeaderAlias("categoryId", "商品分类");
-        reader.addHeaderAlias("supplierId", "供货商");
-        reader.addHeaderAlias("count", "商品库存");
-        List<Goods> list = reader.readAll(Goods.class);
-        for (Goods goods : list) {
-            goodsService.add(goods);
-        }
-        return Result.success();
-    }
 }
