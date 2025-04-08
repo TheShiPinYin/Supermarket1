@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.SupplierMapper">
+
+    <select id="selectAll" resultType="com.example.entity.Supplier">
+        select * from supplier
+        <where>
+            <if test="name != null">and name like concat('%', #{name}, '%')</if>
+        </where>
+        order by id desc
+    </select>
+
+    <update id="updateById" parameterType="com.example.entity.Supplier">
+        update supplier
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

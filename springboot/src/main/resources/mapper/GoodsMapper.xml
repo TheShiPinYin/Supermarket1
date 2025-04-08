@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.GoodsMapper">
+
+    <!-- 查询所有商品信息，支持根据商品名称模糊查询 -->
+    <select id="selectAll" resultType="com.example.entity.Goods">
+        select goods.*, category.name as categoryName, supplier.name as supplierName from goods
+        left join category on goods.category_id = category.id
+        left join supplier on goods.supplier_id = supplier.id
+        <where>
+            <if test="name != null">and goods.name like concat('%', #{name}, '%')</if>
+            <if test="ids != null and ids !=''">
+                and goods.id in
+                <foreach collection="idsArr" open="(" close=")" separator="," item="id">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="category != null">
+                and category.name = category
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectPage" resultType="com.example.entity.Goods">
+        select goods.*, category.name as categoryName, supplier.name as supplierName from goods
+        left join category on goods.category_id = category.id
+        left join supplier on goods.supplier_id = supplier.id
+        <where>
+            <if test="name != null">and goods.name like concat('%', #{name}, '%')</if>
+            <if test="ids != null and ids !=''">
+                and goods.id in
+                <foreach collection="idsArr" open="(" close=")" separator="," item="id">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="category != null">
+                and category.name = category
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- 新增商品信息 -->
+    <insert id="insert" parameterType="com.example.entity.Goods">
+        insert into goods (name, price, img, supplier_id, category_id, count)
+        values (#{name}, #{price}, #{img}, #{supplierId}, #{categoryId}, #{count})
+    </insert>
+
+    <!-- 根据商品 ID 更新商品信息 -->
+    <update id="updateById" parameterType="com.example.entity.Goods">
+        update goods
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="img != null">
+                img = #{img},
+            </if>
+            <if test="supplierId != null">
+                supplier_id = #{supplierId},
+            </if>
+            <if test="categoryId != null">
+                category_id = #{categoryId},
+            </if>
+            <if test="count != null">
+                count = #{count},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据商品 ID 删除商品信息 -->
+    <delete id="deleteById" parameterType="int">
+        delete from goods where id = #{id}
+    </delete>
+
+    <!-- 批量删除商品信息 -->
+    <delete id="deleteBatch" parameterType="java.util.List">
+        delete from goods where id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item.id}
+        </foreach>
+    </delete>
+
+</mapper>

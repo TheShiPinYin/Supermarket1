@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.MessageMapper">
+
+    <insert id="add" parameterType="com.example.entity.Message">
+        INSERT INTO `message` (content, username, time)
+        VALUES (#{content}, #{username}, #{time})
+    </insert>
+
+    <update id="update" parameterType="com.example.entity.Message">
+        UPDATE `message`
+        SET content = #{content},
+        username = #{username},
+        time = #{time}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM `message` WHERE id = #{id}
+    </delete>
+
+    <select id="selectByUsername" resultType="com.example.entity.Message">
+        SELECT * FROM `message`
+        <where>
+            <if test="username != null and username != ''">
+                username LIKE CONCAT('%', #{username}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.Message">
+        select * from `message`
+        <where>
+            <if test="username != null and username != ''">and username like concat('%', #{username}, '%')</if>  <!-- 相当于 name like '%1%' -->
+        </where>
+        order by id desc
+    </select>
+
+</mapper>

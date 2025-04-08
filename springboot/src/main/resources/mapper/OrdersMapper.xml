@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.OrdersMapper">
+
+    <select id="selectAll" resultType="com.example.entity.Orders">
+        select * from `orders`
+        <where>
+            <if test="orderNo != null">and order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="idsArr != null and idsArr.length > 0">
+                and id in
+                <foreach collection="idsArr" open="(" close=")" separator="," item="id">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.Orders">
+        insert into orders (supplier_id, name, count, total, order_no, time)
+        values (#{supplierId}, #{name}, #{count}, #{total}, #{orderNo}, #{time})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Orders">
+        update orders
+        <set>
+            <if test="supplierId != null">
+                supplier_id = #{supplierId},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="count != null">
+                count = #{count},
+            </if>
+            <if test="total != null">
+                total = #{total},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
