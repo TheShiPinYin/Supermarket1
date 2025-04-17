@@ -51,12 +51,6 @@
             <if test="time != null">
                 AND orders.time = #{time}
             </if>
-            <if test="idsarr != null and idsarr.length > 0">
-                AND orders.id IN
-                <foreach collection="idsarr" item="id" open="(" separator="," close=")">
-                    #{id}
-                </foreach>
-            </if>
         </where>
     </select>
 

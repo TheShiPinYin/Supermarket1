@@ -5,11 +5,8 @@ import com.example.entity.Orders;
 import com.example.service.OrdersService;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
